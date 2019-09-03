@@ -1,5 +1,8 @@
 pipeline {
     agent any
+    environment {        
+        DOCKER_IMAGE_NAME = "nelsonlopezam/timeoff"
+    }
     stages {        
         stage('Build Docker Image') {
             when {
@@ -7,7 +10,7 @@ pipeline {
             }
             steps {
                 script {
-                    app = docker.build("nelsonlopezam/timeoff")
+                    app = docker.build(DOCKER_IMAGE_NAME)
                     app.inside {
                         sh 'echo $(curl localhost:3000)'
                     }
@@ -34,18 +37,11 @@ pipeline {
             steps {
                 input 'Deploy to Production?'
                 milestone(1)
-                withCredentials([usernamePassword(credentialsId: 'webserver_login', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS')]) {
-                    script {
-                        sh "sshpass -p '$USERPASS' -v ssh -o StrictHostKeyChecking=no $USERNAME@$prod_ip \"docker pull nelsonlopezam/timeoff:${env.BUILD_NUMBER}\""
-                        try {
-                            sh "sshpass -p '$USERPASS' -v ssh -o StrictHostKeyChecking=no $USERNAME@$prod_ip \"docker stop alpine_timeoff\""
-                            sh "sshpass -p '$USERPASS' -v ssh -o StrictHostKeyChecking=no $USERNAME@$prod_ip \"docker rm alpine_timeoff\""
-                        } catch (err) {
-                            echo: 'caught error: $err'
-                        }
-                        sh "sshpass -p '$USERPASS' -v ssh -o StrictHostKeyChecking=no $USERNAME@$prod_ip \"docker run --restart always --name alpine_timeoff -p 3000:3000 -d nelsonlopezam/timeoff:${env.BUILD_NUMBER}\""
-                    }
-                }
+                kubernetesDeploy(
+                    kubeconfigId: 'kubeconfig',
+                    configs: 'timeoff-kube.yml',
+                    enableConfigSubstitution: true
+                )
             }
         }
     }
