@@ -21,7 +21,7 @@ metadata:
   labels:
     app: timeoff-app
 spec:
-  replicas: $QA_REPLICA
+  replicas: 1
   selector:
     matchLabels:
       app: timeoff-app
