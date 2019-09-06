@@ -2,7 +2,7 @@ pipeline {
     agent any
     environment {        
         DOCKER_IMAGE_NAME = "nelsonlopezam/timeoff"
-        CANARY_REPLICAS = 0
+        QA_REPLICA = 0
     }
     stages {        
         stage('Build Docker Image') {
