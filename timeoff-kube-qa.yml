@@ -30,7 +30,7 @@ spec:
     metadata:
       labels:
         app: timeoff-app
-	track: qa
+        track: qa
     spec:
       containers:
       - name: timeoff-app
