@@ -2,6 +2,7 @@ pipeline {
     agent any
     environment {        
         DOCKER_IMAGE_NAME = "nelsonlopezam/timeoff"
+        CANARY_REPLICAS = 0
     }
     stages {        
         stage('Build Docker Image') {
@@ -66,8 +67,7 @@ pipeline {
             when {
                 branch 'master'
             }            
-            steps {
-                input 'Deploy to Production?'
+            steps {                
                 milestone(1)
                 kubernetesDeploy(
                     kubeconfigId: 'kubeconfig',
