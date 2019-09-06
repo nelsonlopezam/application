@@ -25,12 +25,12 @@ spec:
   selector:
     matchLabels:
       app: timeoff-app
-	  track: qa
+      track: qa
   template: 
     metadata:
       labels:
         app: timeoff-app
-		track: qa
+	track: qa
     spec:
       containers:
       - name: timeoff-app
