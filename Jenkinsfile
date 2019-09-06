@@ -1,8 +1,7 @@
 pipeline {
     agent any
     environment {        
-        DOCKER_IMAGE_NAME = "nelsonlopezam/timeoff"
-        QA_REPLICA = 0
+        DOCKER_IMAGE_NAME = "nelsonlopezam/timeoff"        
     }
     stages {        
         stage('Build Docker Image') {
