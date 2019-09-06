@@ -1,0 +1,49 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: timeoff-app-service-qa
+spec:
+  type: NodePort
+  selector:
+    app: timeoff-app
+  ports:
+  - protocol: TCP
+    port: 3000
+    targetPort: 3000
+    nodePort: 30001
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: timeoff-app-deployment-qa
+  labels:
+    app: timeoff-app
+spec:
+  replicas: $QA_REPLICA
+  selector:
+    matchLabels:
+      app: timeoff-app
+	  track: qa
+  template: 
+    metadata:
+      labels:
+        app: timeoff-app
+		track: qa
+    spec:
+      containers:
+      - name: timeoff-app
+        image: $DOCKER_IMAGE_NAME:$BUILD_NUMBER
+        ports:
+        - containerPort: 3000
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 15
+          timeoutSeconds: 1
+          periodSeconds: 10
+		resources:
+          requests:
+            cpu: 200m
