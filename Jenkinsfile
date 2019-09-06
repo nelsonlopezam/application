@@ -31,38 +31,6 @@ pipeline {
                 }
             }
         }
-        stage('QADeploy') {
-            when {
-                branch 'master'
-            }
-            environment { 
-                QA_REPLICA = 1
-            }
-            steps {
-                kubernetesDeploy(
-                    kubeconfigId: 'kubeconfig',
-                    configs: 'timeoff-kube-qa.yml',
-                    enableConfigSubstitution: true
-                )
-            }
-        }
-        stage('SmokeTest') {
-            when {
-                branch 'master'
-            }
-            steps {
-                script {
-                    sleep (time: 5)
-                    def response = httpRequest (
-                        url: "http://$KUBE_MASTER_IP:30001/",
-                        timeout: 30
-                    )
-                    if (response.status != 200) {
-                        error("Smoke test against QA deployment failed.")
-                    }
-                }
-            }
-        }
         stage('DeployToProduction') {
             when {
                 branch 'master'
@@ -76,14 +44,5 @@ pipeline {
                 )
             }
         }        
-    }
-    post {
-        cleanup {
-            kubernetesDeploy (
-                kubeconfigId: 'kubeconfig',
-                configs: 'train-schedule-kube-canary.yml',
-                enableConfigSubstitution: true
-            )
-        }
-    }
+    }    
 }
